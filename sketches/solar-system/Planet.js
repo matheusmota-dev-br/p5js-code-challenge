@@ -1,57 +1,46 @@
 class Planet {
-  constructor(r, d, o) {
-    this.v = p5.Vector.random3D();
-
-    this.radius = r;
-    this.distance = d;
-    this.v.mult(this.distance);
-    this.angle = random(TWO_PI);
-    this.orbitspeed = o;
-
-    this.planets = null;
+  constructor(radius, distance, orbitSpeed) {
+    this.radius = radius
+    this.position = p5.Vector.random3D().mult(distance)
+    this.angle = random(TWO_PI)
+    this.orbitSpeed = orbitSpeed
+    this.moons = []
   }
 
   orbit() {
-    this.angle = this.angle + this.orbitspeed;
-    if (this.planets != null) {
-      for (let i = 0; i < this.planets.length; i++) {
-        this.planets[i].orbit();
-      }
-    }
+    this.angle += this.orbitSpeed
+    this.moons.forEach((moon) => moon.orbit())
   }
 
   spawnMoons(total, level) {
-    this.planets = [];
     for (let i = 0; i < total; i++) {
-      let r = this.radius / (level * 2);
-      let d = random(this.radius + r, (this.radius + r) * 2);
-      let o = random(-0.1, 0.1);
-      this.planets[i] = new Planet(r, d, o);
+      const radius = this.radius / (level * 2)
+      const distance = random(
+        this.radius + radius,
+        (this.radius + radius) * 2
+      )
+      const moon = new Planet(radius, distance, random(-0.1, 0.1))
+      this.moons.push(moon)
+
       if (level < 2) {
-        let num = int(random(0, 3));
-        this.planets[i].spawnMoons(num, level + 1);
+        moon.spawnMoons(int(random(0, 3)), level + 1)
       }
     }
   }
 
   show() {
-    push();
-    noStroke();
-    let v2 = createVector(1, 0, 1);
-    let p = this.v.cross(v2);
-    if (p.x != 0 || p.y != 0 || p.z != 0) {
-      rotate(this.angle, p);
+    push()
+    noStroke()
+    fill(255)
+
+    const axis = this.position.cross(createVector(1, 0, 1))
+    if (axis.x !== 0 || axis.y !== 0 || axis.z !== 0) {
+      rotate(this.angle, axis)
     }
-    stroke(255);
-    translate(this.v.x, this.v.y, this.v.z);
-    noStroke();
-    fill(255);
-    sphere(this.radius);
-    if (this.planets != null) {
-      for (let i = 0; i < this.planets.length; i++) {
-        this.planets[i].show();
-      }
-    }
-    pop();
+    translate(this.position.x, this.position.y, this.position.z)
+    sphere(this.radius)
+
+    this.moons.forEach((moon) => moon.show())
+    pop()
   }
 }

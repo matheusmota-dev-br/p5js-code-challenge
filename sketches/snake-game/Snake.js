@@ -1,58 +1,66 @@
 class Snake {
+  constructor() {
+    this.len = 0
+    this.body = [createVector(floor(w / 2), floor(h / 2))]
+    this.xdir = 0
+    this.ydir = 0
+    this.movedX = 0
+    this.movedY = 0
+  }
 
-    constructor(){
-        this.len = 0
-        this.body = []
-        this.body[0] = createVector(floor(w/2),floor(h/2))
-        this.xdir = 0
-        this.ydir = 0
-    }
-    setDir(x, y){
-        this.xdir = x
-        this.ydir = y
-    }
-    update(){
-        let head = this.body[this.body.length-1].copy()
-        this.body.shift()
-        head.x += this.xdir
-        head.y += this.ydir
-        this.body.push(head)
-    }
-    grow(){
-        let head = this.body[this.body.length-1].copy()
-        this.len++
-        this.body.push(head)
-    }
-    endGame(){
-        let x = this.body[this.body.length - 1].x
-        let y = this.body[this.body.length - 1].y
+  get head() {
+    return this.body[this.body.length - 1]
+  }
 
-        if(x > w -1 || x < 0 || y > h -1 || y < 0){
-            return true
-        }
+  setDir(x, y) {
+    // Compared with the last move, not the last key: two quick presses in
+    // the same tick must not turn the snake back into itself.
+    const isReversal = x === -this.movedX && y === -this.movedY
+    if (this.len > 0 && isReversal) {
+      return
+    }
+    this.xdir = x
+    this.ydir = y
+  }
 
-        for(let i = 0; i < this.body.length - 1; i++){
-            let part = this.body[i]
-            if(part.x == x && part.y == y){
-                return true
-            }
-        }
-        return false
+  update() {
+    const head = this.head.copy()
+    head.x += this.xdir
+    head.y += this.ydir
+    this.body.shift()
+    this.body.push(head)
+    this.movedX = this.xdir
+    this.movedY = this.ydir
+  }
+
+  grow() {
+    this.len++
+    this.body.push(this.head.copy())
+  }
+
+  eat(pos) {
+    if (pos && this.head.x === pos.x && this.head.y === pos.y) {
+      this.grow()
+      return true
     }
-    eat(pos){
-        let x = this.body[this.body.length - 1].x
-        let y = this.body[this.body.length - 1].y
-        if(x == pos.x && y == pos.y){
-            this.grow()
-            return true
-        }
-        return false
+    return false
+  }
+
+  occupies(x, y) {
+    return this.body.some((part) => part.x === x && part.y === y)
+  }
+
+  hasCrashed() {
+    const { x, y } = this.head
+    if (x > w - 1 || x < 0 || y > h - 1 || y < 0) {
+      return true
     }
-    show(){
-        for(let i = 0; i < this.body.length; i++){
-            fill(0)
-            noStroke()
-            rect(this.body[i].x, this.body[i].y, 1, 1)
-        }
-    }
+    return this.body.slice(0, -1).some((part) => part.x === x && part.y === y)
+  }
+
+  show() {
+    noStroke()
+    fill(0)
+    this.body.forEach((part) => rect(part.x, part.y, 1, 1))
+  }
 }

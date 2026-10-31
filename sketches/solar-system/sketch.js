@@ -1,18 +1,15 @@
 let sun
-let cam
 
-function setup(){
-  let canvas = createCanvas(600, 600, WEBGL)
-  canvas.elt.oncontextmenu = () => false
-
-  cam = createEasyCam({distance: 500})
+function setup() {
+  createCanvas(600, 600, WEBGL)
 
   sun = new Planet(50, 0, 0)
   sun.spawnMoons(4, 1)
 }
 
-function draw(){
+function draw() {
   background(0)
+  orbitControl()
   lights()
   sun.show()
   sun.orbit()

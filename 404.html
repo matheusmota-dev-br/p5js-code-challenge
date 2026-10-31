@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Page not found · p5.js Code Challenge</title>
+    <link rel="icon" href="/p5js-code-challenge/assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/p5js-code-challenge/assets/site.css">
+    <script>
+      // The sketches used to live at the repository root, some under other
+      // names. This keeps those old links working.
+      const BASE = '/p5js-code-challenge'
+      const RENAMED = {
+        'startfield-in-processing': 'starfield',
+        'lorentz-attractor': 'lorenz-attractor',
+        'menger-sponge-fractal': 'menger-sponge',
+      }
+      const MOVED = [
+        'fractal-trees',
+        'mandelbrot',
+        'maze-generation',
+        'purple-rain',
+        'quadtree',
+        'snake-game',
+        'solar-system',
+      ]
+
+      const oldFolder = location.pathname.slice(BASE.length).split('/')[1]
+      const folder = RENAMED[oldFolder] || (MOVED.includes(oldFolder) && oldFolder)
+      if (folder) {
+        location.replace(`${BASE}/sketches/${folder}/`)
+      }
+    </script>
+  </head>
+  <body>
+    <main class="not-found">
+      <h1>Page not found</h1>
+      <p><a href="/p5js-code-challenge/">Back to all sketches</a></p>
+    </main>
+  </body>
+</html>

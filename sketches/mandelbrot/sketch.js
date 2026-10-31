@@ -1,50 +1,44 @@
-let minval = -0.5
-let maxval = 0.5
+const MAX_ITERATIONS = 100
+const ESCAPE_RADIUS_SQUARED = 16
 
-function setup(){
-    createCanvas(800, 800)
-    pixelDensity(1)
+function setup() {
+  createCanvas(640, 640)
+  pixelDensity(1)
+  // The image never changes, so it only needs to be computed once.
+  noLoop()
 }
-function draw(){
-    let maxIterations = 100
 
-    loadPixels()
-    for(let x = 0; x < width; x ++){
-        for(let y = 0; y < height; y++){
-            let a = map(x, 0, width, -2.5, 2.5)
-            let b = map(y, 0, width, -2.5, 2.5)
+function draw() {
+  loadPixels()
+  for (let px = 0; px < width; px++) {
+    for (let py = 0; py < height; py++) {
+      const ca = map(px, 0, width, -2.2, 0.8)
+      const cb = map(py, 0, height, -1.5, 1.5)
+      const n = iterations(ca, cb)
 
-            let ca = a
-            let cb = b
+      const brightness =
+        n === MAX_ITERATIONS ? 0 : sqrt(n / MAX_ITERATIONS) * 255
 
-            let n = 0
-
-            while(n < maxIterations){
-                let aa = a * a - b * b
-                let bb = 2 * a * b
-                
-                a = aa + ca
-                b = bb + cb
-
-                if(a * a + b * b > 16){
-                    break
-                }
-
-                n++
-            }
-            let bright = map(n, 0, maxIterations, 0, 1)
-            bright = map(sqrt(bright), 0, 1, 0, 255)
-            if( n == maxIterations){
-                bright = 0
-            }
-
-            let pix = (x + y * width) * 4
-
-            pixels[pix + 0] = bright
-            pixels[pix + 1] = bright
-            pixels[pix + 2] = bright
-            pixels[pix + 3] = 255
-        }
+      const offset = (px + py * width) * 4
+      pixels[offset] = brightness
+      pixels[offset + 1] = brightness
+      pixels[offset + 2] = brightness
+      pixels[offset + 3] = 255
     }
-    updatePixels()
+  }
+  updatePixels()
+}
+
+function iterations(ca, cb) {
+  let a = ca
+  let b = cb
+  for (let n = 0; n < MAX_ITERATIONS; n++) {
+    const nextA = a * a - b * b + ca
+    b = 2 * a * b + cb
+    a = nextA
+    if (a * a + b * b > ESCAPE_RADIUS_SQUARED) {
+      return n
+    }
+  }
+  return MAX_ITERATIONS
 }
